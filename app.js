@@ -64,10 +64,10 @@ class CalendarApp extends Homey.App {
 
   }
 
-  updateEvents() {
+  async updateEvents() {
     var calendars = Homey.ManagerSettings.get("calendars") || [];
 
-    calendars.forEach(function(calendar) {
+    await calendars.forEach(function(calendar) {
       ical.fromURL(calendar.url, {}, function(err, data) {
         if (err) this.log(err);
 
