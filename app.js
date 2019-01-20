@@ -68,103 +68,101 @@ class CalendarApp extends Homey.App {
   async updateEvents() {
     const calendars = Homey.ManagerSettings.get("calendars") || [];
     const icalFromURL = promisify(ical.fromURL);
+    events.length = 0;
 
     for (const calendar of calendars) {
-      const data = await icalFromURL(calendar.url, function(err, data) {
-        if (err) this.log(err);
+      const data = await icalFromURL(calendar.url, {});
 
-        events.length = 0;
+      for (let k in data) {
+    		if (data.hasOwnProperty(k)) {
 
-        for (let k in data) {
-      		if (data.hasOwnProperty(k)) {
+          var rangeStart = moment().startOf("day");
+          var rangeEnd = moment(rangeStart).add(6, "months");
+          var event = data[k];
 
-            var rangeStart = moment().startOf("day");
-            var rangeEnd = moment(rangeStart).add(6, "months");
-            var event = data[k];
+    			if (event.type == 'VEVENT') {
 
-      			if (event.type == 'VEVENT') {
+            var title = event.summary;
+    	      var startDate = moment(event.start);
+    	      var endDate = moment(event.end);
+            var duration = parseInt(endDate.format("x")) - parseInt(startDate.format("x"));
 
-              var title = event.summary;
-      	      var startDate = moment(event.start);
-      	      var endDate = moment(event.end);
-              var duration = parseInt(endDate.format("x")) - parseInt(startDate.format("x"));
+            if (typeof event.rrule === 'undefined' && moment(event.start).isSameOrAfter(moment(), 'day')) {
+              // single events
 
-              if (typeof event.rrule === 'undefined' && moment(event.start).isSameOrAfter(moment(), 'day')) {
-                // single events
+              events.push({
+                calendar: calendar.name,
+                title: title,
+                startdate: event.start,
+                enddate: event.end,
+                duration: moment.duration(duration).humanize(),
+                location: event.location,
+                recurring: false
+              });
 
-                events.push({
-                  calendar: calendar.name,
-                  title: title,
-                  startdate: event.start,
-                  enddate: event.end,
-                  duration: moment.duration(duration).humanize(),
-                  location: event.location,
-                  recurring: false
-                });
+            } else if (typeof event.rrule !== 'undefined') {
+              // recurring events
 
-              } else if (typeof event.rrule !== 'undefined') {
-                // recurring events
+              var dates = event.rrule.between(
+        			  rangeStart.toDate(),
+        			  rangeEnd.toDate(),
+        			  true,
+        			  function(date, i) {return true;}
+        			)
 
-                var dates = event.rrule.between(
-          			  rangeStart.toDate(),
-          			  rangeEnd.toDate(),
-          			  true,
-          			  function(date, i) {return true;}
-          			)
+              if (event.recurrences != undefined) {
+        				for (var r in event.recurrences) {
+        					if (moment(new Date(r)).isBetween(rangeStart, rangeEnd) != true) {
+        						dates.push(new Date(r));
+        					}
+        				}
+        			}
 
-                if (event.recurrences != undefined) {
-          				for (var r in event.recurrences) {
-          					if (moment(new Date(r)).isBetween(rangeStart, rangeEnd) != true) {
-          						dates.push(new Date(r));
-          					}
-          				}
-          			}
+              for (var i in dates) {
+        				var date = dates[i];
+        				var curEvent = data[k];
+        				var showRecurrence = true;
+        				var curDuration = duration;
 
-                for (var i in dates) {
-          				var date = dates[i];
-          				var curEvent = data[k];
-          				var showRecurrence = true;
-          				var curDuration = duration;
+        				startDate = moment(date);
 
-          				startDate = moment(date);
+        				var dateLookupKey = date.toISOString().substring(0, 10);
 
-          				var dateLookupKey = date.toISOString().substring(0, 10);
+        				if ((curEvent.recurrences != undefined) && (curEvent.recurrences[dateLookupKey] != undefined)) {
+        					curEvent = curEvent.recurrences[dateLookupKey];
+        					startDate = moment(curEvent.start);
+        					curDuration = parseInt(moment(curEvent.end).format("x")) - parseInt(startDate.format("x"));
+        				}	else if ((curEvent.exdate != undefined) && (curEvent.exdate[dateLookupKey] != undefined))	{
+        					showRecurrence = false;
+        				}
 
-          				if ((curEvent.recurrences != undefined) && (curEvent.recurrences[dateLookupKey] != undefined)) {
-          					curEvent = curEvent.recurrences[dateLookupKey];
-          					startDate = moment(curEvent.start);
-          					curDuration = parseInt(moment(curEvent.end).format("x")) - parseInt(startDate.format("x"));
-          				}	else if ((curEvent.exdate != undefined) && (curEvent.exdate[dateLookupKey] != undefined))	{
-          					showRecurrence = false;
-          				}
+        				var recurrenceTitle = curEvent.summary;
+                var recurrenceLocation = curEvent.location;
+        				endDate = moment(parseInt(startDate.format("x")) + curDuration, 'x');
 
-          				var recurrenceTitle = curEvent.summary;
-                  var recurrenceLocation = curEvent.location;
-          				endDate = moment(parseInt(startDate.format("x")) + curDuration, 'x');
+        				if (endDate.isBefore(rangeStart) || startDate.isAfter(rangeEnd)) {
+        					showRecurrence = false;
+        				}
 
-          				if (endDate.isBefore(rangeStart) || startDate.isAfter(rangeEnd)) {
-          					showRecurrence = false;
-          				}
-
-          				if (showRecurrence === true) {
-                    events.push({
-                      calendar: calendar.name,
-                      title: recurrenceTitle,
-                      startdate: startDate,
-                      enddate: endDate,
-                      duration: moment.duration(curDuration).humanize(),
-                      location: recurrenceLocation,
-                      recurring: true
-                    });
-          				}
-          			}
-              }
+        				if (showRecurrence === true) {
+                  events.push({
+                    calendar: calendar.name,
+                    title: recurrenceTitle,
+                    startdate: startDate,
+                    enddate: endDate,
+                    duration: moment.duration(curDuration).humanize(),
+                    location: recurrenceLocation,
+                    recurring: true
+                  });
+        				}
+        			}
             }
           }
         }
-      });
+      }
     }
 
+    // sorting events by date
     events.sort(function (left, right) {
       return moment(left.startdate).diff(moment(right.startdate))
     });
