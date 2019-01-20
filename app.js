@@ -3,6 +3,7 @@
 const Homey = require('homey');
 const ical = require('node-ical');
 const moment = require('moment');
+const { promisify } = require('util');
 var events = [];
 
 class CalendarApp extends Homey.App {
@@ -65,10 +66,11 @@ class CalendarApp extends Homey.App {
   }
 
   async updateEvents() {
-    var calendars = Homey.ManagerSettings.get("calendars") || [];
+    const calendars = Homey.ManagerSettings.get("calendars") || [];
+    const icalFromURL = promisify(ical.fromURL);
 
-    await calendars.forEach(function(calendar) {
-      ical.fromURL(calendar.url, {}, function(err, data) {
+    for (const calendar of calendars) {
+      const data = await icalFromURL(calendar.url, function(err, data) {
         if (err) this.log(err);
 
         events.length = 0;
@@ -161,7 +163,7 @@ class CalendarApp extends Homey.App {
           }
         }
       });
-    });
+    }
 
     events.sort(function (left, right) {
       return moment(left.startdate).diff(moment(right.startdate))
