@@ -1,0 +1,17 @@
+{
+  "moment_locale": "en",
+  "settings": {
+    "title": "iCalendar for Homey",
+    "calendars": {
+      "legend": "Calendars",
+      "intro": "Enter the name and the icalendar link for each calendar you wish to add.",
+      "calendar_name": "Calendar Name",
+      "calendar_url": "iCal URL"
+    },
+    "general": {
+      "legend": "General Settings",
+      "interval": "Refresh interval in minutes",
+      "save": "Save"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "icalendar.homey",
+  "version": "1.0.0",
+  "description": "Homey app for using calendars in the icalendar format",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jghaanstra/icalendar.homey.git"
+  },
+  "keywords": [
+    "icalendar"
+  ],
+  "author": "Jelger Haanstra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jghaanstra/icalendar.homey/issues"
+  },
+  "homepage": "https://apps.athom.com/app/icalendar.homey",
+  "dependencies": {
+    "moment": "^2.23.0",
+    "node-ical": "^0.9.0"
+  }
+}

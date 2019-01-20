@@ -1,0 +1,17 @@
+{
+  "moment_locale": "nl",
+  "settings": {
+    "title": "iCalendar voor Homey",
+    "calendars": {
+      "legend": "Kalenders",
+      "intro": "Voeg de naam en de icalendar link toe voor elke kalender die je wilt gebruiken.",
+      "calendar_name": "Kalender naam",
+      "calendar_url": "iCal URL"
+    },
+    "general": {
+      "legend": "Algemene instellingen",
+      "interval": "Ververs frequentie in minuten",
+      "save": "Opslaan"
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+	"id": "icalendar.homey",
+	"sdk": 2,
+	"brandColor": "#ec4134",
+	"name": {
+		"en": "iCalendar",
+		"nl": "iCalendar"
+	},
+	"tags": {
+		"en": [ "calendar", "agenda", "icalendar", "ical" ],
+		"nl": [ "kalender", "agenda", "icalendar", "ical" ]
+	},
+	"version": "1.0.0",
+	"compatibility": ">=1.5.13",
+	"author": {
+		"name": "Jelger Haanstra",
+		"email": "homey@solidewebservices.com",
+		"website": "https://github.com/jghaanstra/icalendar.homey"
+	},
+	"contributing": {
+		"donate": {
+			"paypal": {
+				"username": "jghaanstra"
+			}
+		}
+	},
+	"bugs": {
+		"url": "https://github.com/jghaanstra/icalendar.homey/issues"
+	},
+	"homeyCommunityTopicId": 765,
+	"images": {
+		"large": "./assets/images/large.jpg",
+		"small": "./assets/images/small.jpg"
+	},
+	"category": "internet",
+	"description": {
+		"en": "iCalendar for Homey",
+		"nl": "iCalendar for Homey"
+	},
+	"dependencies": {
+		"net": "*"
+	},
+  "permissions": [
+    "homey:manager:speech-output"
+  ],
+  "flow": {
+    "triggers": [
+      {
+        "id": "trigger_next_appointment_in",
+        "title": {
+          "en": "Next appointment in...",
+          "nl": "Volgende afspraak over..."
+        },
+        "tokens": [
+          {
+            "name": "calendar",
+            "title": {
+              "en": "calendar",
+              "nl": "kalender"
+            }
+          },
+          {
+            "name": "date",
+            "title": {
+              "en": "date",
+              "nl": "datum"
+            }
+          },
+          {
+            "name": "time",
+            "title": {
+              "en": "time",
+              "nl": "tijd"
+            }
+          },
+          {
+            "name": "summary",
+            "title": {
+              "en": "appointment",
+              "nl": "afspraak"
+            }
+          },
+          {
+            "name": "location",
+            "title": {
+              "en": "location",
+              "nl": "locatie"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "timespan_number",
+            "type": "number",
+            "min": 0,
+            "max": 3600,
+            "step": 1
+          },
+          {
+            "name": "timespan_unit",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "minutes",
+                "label": {
+                  "en": "Minutes",
+                  "nl": "Minuten"
+                }
+              },
+              {
+                "id": "hours",
+                "label": {
+                  "en": "Hours",
+                  "nl": "Uren"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "action_next_appointment",
+        "title": {
+          "en": "Your next appointment",
+          "nl": "Je volgende afspraak"
+        }
+      }
+    ]
+  }
+}

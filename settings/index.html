@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=0">
+    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+    <script type="text/javascript" src="../assets/scripts/jquery-3.3.1.slim.min.js"></script>
+    <style>
+      fieldset.calendars .row.entries {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 1em;
+      }
+      fieldset.calendars .row input {
+        margin-bottom: 4px;
+      }
+      fieldset.settings .row label.calendar_name_label_interval {
+        width: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 data-i18n="settings.title">iCalendar for Homey</h1>
+    <fieldset class="calendars">
+        <legend><span data-i18n="settings.calendars.legend">Calendars</span></legend>
+        <p data-i18n="settings.calendars.intro">Enter the name and the icalendar link for each calendar you wish to add.</p>
+        <div class="field row new_calendar entries">
+          <input class="calendar_name" name="calendar_names[]" type="text" value="" placeholder="Name"/>
+          <input class="calendar_url" name="calendar_urls[]" type="text" value="" placeholder="iCal URL"/>
+        </div>
+        <div class="field row add_calendar">
+          <button id="add">&#43;</button>
+        </div>
+    </fieldset>
+
+    <fieldset class="settings">
+      <legend><span data-i18n="settings.general.legend">General Settings</span></legend>
+      <div class="field row">
+        <label class="calendar_name_label_interval"><span data-i18n="settings.general.interval">Refresh interval in minutes</span></label>
+        <select id="calendar_refresh_interval">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="60">60</option>
+          <option value="120">120</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <button id="save" data-i18n="settings.general.save">Save</button>
+
+    <script type="text/javascript">
+      function onHomeyReady(Homey) {
+
+        // Tell Homey we're ready to be displayed
+        Homey.ready();
+
+        // fetch existing calendars
+        Homey.get("calendars", function (err, calendars) {
+          if( err ) return Homey.alert( err );
+          if (calendars) {
+            for (var i = 0; i < calendars.length; i++) {
+              var calendar = calendars[i];
+              var newCal = $(".new_calendar").clone();
+              newCal.removeClass("new_calendar");
+              $(".calendar_name", newCal).val(calendar.name);
+              $(".calendar_url", newCal).val(calendar.url);
+              newCal.insertBefore(".new_calendar");
+            }
+          }
+        });
+
+        // fetch interval settings
+        Homey.get("calendar_refresh_interval", function(err, intervalInMinutes) {
+          if( err ) return Homey.alert( err );
+          $("#calendar_refresh_interval").val(intervalInMinutes || 5);
+        });
+
+        // add new calendar
+        document.getElementById("add").addEventListener("click", function(e) {
+          var newCal = $(".new_calendar").clone();
+          newCal.removeClass("new_calendar");
+          $(".calendar_name", newCal).val("");
+          $(".calendar_url", newCal).val("");
+          newCal.insertBefore(".add_calendar");
+          $(".calendar_name", newCal).focus();
+        });
+
+        // save settings
+        document.getElementById("save").addEventListener("click", function(e) {
+          var calendarNames = $('input[name^=calendar_names]').map(function (idx, elem) { return $(elem).val(); }).get();
+          var calendarUrls = $('input[name^=calendar_urls]').map(function (idx, elem) { return $(elem).val(); }).get();
+          var calendars = [];
+          for (var i = 0; i < calendarUrls.length; i++) {
+            if (calendarNames[i].length > 0 && calendarUrls[i].length > 0) {
+              calendars.push({ name: calendarNames[i], url: calendarUrls[i] });
+            }
+          }
+          var refreshIntervalInMinutes = $("#calendar_refresh_interval").val();
+
+          // save refresh interval
+          Homey.set('calendar_refresh_interval', refreshIntervalInMinutes, function(err) {
+            if (err) return Homey.alert(err);
+          });
+
+          // save calendars
+          Homey.set('calendars', calendars, function(err) {
+            if (err) return Homey.alert(err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
