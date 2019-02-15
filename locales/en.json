@@ -1,6 +1,7 @@
 {
   "settings": {
     "title": "iCalendar for Homey",
+    "saved": "Your changes have been saved.",
     "calendars": {
       "legend": "Calendars",
       "intro": "Enter the name and the icalendar link for each calendar you wish to add.",

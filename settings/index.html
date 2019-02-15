@@ -22,6 +22,15 @@
       fieldset.settings .row label.calendar_name_label_interval {
         width: auto;
       }
+      .messages {
+        display: none;
+        background-color: #E99D08;
+        color: #EC3505;
+        border: 2px solid #EC3505;
+        border-radius: 4px;
+        margin: 8px 0;
+        padding: 4px 6px;
+      }
       button#add {
         background-color: #00c139 !important;
       }
@@ -59,6 +68,8 @@
         </select>
       </div>
     </fieldset>
+
+    <div class="messages" data-i18n="settings.saved">Your changes have been saved.</div>
 
     <button id="save" data-i18n="settings.general.save">Save</button>
 
@@ -111,6 +122,8 @@
             }
           }
           var refreshIntervalInMinutes = $("#calendar_refresh_interval").val();
+          $('.messages').show();
+          setTimeout(function() { $(".messages").hide(); }, 5000);
 
           // save refresh interval
           Homey.set('calendar_refresh_interval', refreshIntervalInMinutes, function(err) {
