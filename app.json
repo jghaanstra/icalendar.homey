@@ -11,7 +11,7 @@
 		"nl": [ "kalender", "agenda", "icalendar", "ical" ]
 	},
 	"version": "1.0.0",
-	"compatibility": ">=1.5.13",
+	"compatibility": ">=2.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
 		"email": "homey@solidewebservices.com",
@@ -41,8 +41,71 @@
 		"net": "*"
 	},
   "permissions": [
+    "homey:manager:speech-input",
     "homey:manager:speech-output"
   ],
+  "speech": {
+    "en": {
+      "element": {
+        "actionWords": {
+          "type": "regex",
+          "value": "(look\\s?up|find|search(\\sfor)?|tell(\\sme|\\sus)?\\sabout|what\\s?(is|are)?(\\smy)?)"
+        },
+        "timespan": {
+          "type": "regex",
+          "value": "(next|first|all)"
+        },
+        "when": {
+          "type": "regex",
+          "value": "(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)"
+        },
+        "triggers": {
+          "type": "regex",
+          "value": "((in\\s)?calendar|agenda|schedule|appointment|appointments)"
+        }
+      },
+      "group": {
+        "main": {
+          "set": "(actionWords) && timespan && when && triggers",
+          "ordered": false,
+          "allowDisconnect": true,
+          "capturingGroup": true
+        }
+      }
+    },
+    "nl": {
+      "element": {
+        "actionWords": {
+          "type": "regex",
+          "value": "(zoek\\s?op|vind|zoek(\\svoor)?|vertel(\\sme|\\sons)?\\sover|wat\\s?(is|zijn)?(\\smijn)?)"
+        },
+        "timespan": {
+          "type": "regex",
+          "value": "(volgende|eerste|al|alle)"
+        },
+        "when": {
+          "type": "regex",
+          "value": "(vandaag|morgen|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)"
+        },
+        "triggers": {
+          "type": "regex",
+          "value": "((in\\s)?kalender|agenda|schema|afspraak|afspraken)"
+        }
+      },
+      "group": {
+        "main": {
+          "set": "(actionWords) && timespan && when && triggers",
+          "ordered": false,
+          "allowDisconnect": true,
+          "capturingGroup": true
+        }
+      }
+    }
+  },
+  "speechExamples": {
+    "en": [ "What is my first appointment today?", "What are all my appointments for today/tomorrow/sunday/monday/tuesday/wednesday/thursday/friday/saturday/?" ],
+    "nl": [ "Wat is mijn eerste afspraak morgen?", "Wat zijn al mijn afspraken voor vandaag/morgen/zondag/maandag/dinsdagy/woensdag/donderdag/vrijdag/zaterdag/?" ]
+  },
   "flow": {
     "triggers": [
       {
@@ -74,7 +137,7 @@
             }
           },
           {
-            "name": "summary",
+            "name": "title",
             "title": {
               "en": "appointment",
               "nl": "afspraak"
@@ -90,31 +153,23 @@
         ],
         "args": [
           {
-            "name": "timespan_number",
-            "type": "number",
-            "min": 0,
-            "max": 3600,
-            "step": 1
+            "name": "calendar",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Select Calendar",
+              "nl": "Selecteer kalender"
+            }
           },
           {
-            "name": "timespan_unit",
-            "type": "dropdown",
-            "values": [
-              {
-                "id": "minutes",
-                "label": {
-                  "en": "Minutes",
-                  "nl": "Minuten"
-                }
-              },
-              {
-                "id": "hours",
-                "label": {
-                  "en": "Hours",
-                  "nl": "Uren"
-                }
-              }
-            ]
+            "name": "timespan",
+            "type": "number",
+            "min": 0,
+            "max": 1440,
+            "step": 1,
+            "placeholder": {
+              "en": "Minutes",
+              "nl": "Minuten"
+            }
           }
         ]
       }
@@ -123,9 +178,165 @@
       {
         "id": "action_next_appointment",
         "title": {
-          "en": "Your next appointment",
-          "nl": "Je volgende afspraak"
-        }
+          "en": "Next appointment",
+          "nl": "Volgende afspraak"
+        },
+        "args": [
+          {
+            "name": "calendar",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Select Calendar",
+              "nl": "Selecteer kalender"
+            }
+          }
+				]
+      },
+      {
+        "id": "action_todays_appointments",
+        "title": {
+          "en": "Appointments Today",
+          "nl": "Afspraken vandaag"
+        },
+        "args": [
+          {
+            "name": "calendar",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Select Calendar",
+              "nl": "Selecteer kalender"
+            }
+          },
+          {
+            "name": "timespan",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "today_all",
+                "label": {
+                  "en": "All appointments of today",
+                  "nl": "Alle afspraken van vandaag"
+                }
+              },
+              {
+                "id": "today_upcoming",
+                "label": {
+                  "en": "Upcoming appointments of today",
+                  "nl": "Komende afspraken van vandaag"
+                }
+              }
+            ]
+          }
+				]
+      },
+      {
+        "id": "action_tomorrows_appointments",
+        "title": {
+          "en": "Appointments Tomorrow",
+          "nl": "Afspraken morgen"
+        },
+        "args": [
+          {
+            "name": "calendar",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Select Calendar",
+              "nl": "Selecteer kalender"
+            }
+          },
+          {
+            "name": "timespan",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "tomorrow_all",
+                "label": {
+                  "en": "All appointments of tomorrow",
+                  "nl": "Alle afspraken van morgen"
+                }
+              },
+              {
+                "id": "tomorrow_first",
+                "label": {
+                  "en": "First appointment of tomorrow",
+                  "nl": "Eerste afspraak van morgen"
+                }
+              }
+            ]
+          }
+				]
+      },
+      {
+        "id": "action_dayschedule",
+        "title": {
+          "en": "Your appointments on ...",
+          "nl": "Je afspraken op ..."
+        },
+        "args": [
+          {
+            "name": "calendar",
+            "type": "autocomplete",
+            "placeholder": {
+              "en": "Select Calendar",
+              "nl": "Selecteer kalender"
+            }
+          },
+          {
+            "name": "dow",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "1",
+                "label": {
+                  "en": "Monday",
+                  "nl": "Maandag"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Tuesday",
+                  "nl": "Dinsdag"
+                }
+              },
+              {
+                "id": "3",
+                "label": {
+                  "en": "Wednesday",
+                  "nl": "Woensdag"
+                }
+              },
+              {
+                "id": "4",
+                "label": {
+                  "en": "Thursday",
+                  "nl": "Donderdag"
+                }
+              },
+              {
+                "id": "5",
+                "label": {
+                  "en": "Friday",
+                  "nl": "Vrijdag"
+                }
+              },
+              {
+                "id": "6",
+                "label": {
+                  "en": "Saturday",
+                  "nl": "Zaterdag"
+                }
+              },
+              {
+                "id": "7",
+                "label": {
+                  "en": "Sunday",
+                  "nl": "Zondag"
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   }

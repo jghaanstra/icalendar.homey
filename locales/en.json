@@ -1,5 +1,4 @@
 {
-  "moment_locale": "en",
   "settings": {
     "title": "iCalendar for Homey",
     "calendars": {
@@ -13,5 +12,33 @@
       "interval": "Refresh interval in minutes",
       "save": "Save"
     }
-  }
+  },
+  "moment_locale": "en",
+  "Appointment": "appointment",
+  "Appointments": "appointments",
+  "Today": "today",
+  "Tomorrow": "tomorrow",
+  "Monday": "monday",
+  "Tuesday": "tuesday",
+  "Wednesday": "wednesday",
+  "Thursday": "thursday",
+  "Friday": "friday",
+  "Saturday": "saturday",
+  "Sunday": "sunday",
+  "All": "All Calendars",
+  "Upcoming": " upcoming",
+  "List of appointments": "{0} at {1}.",
+  "No appointments": "You have no appointments {0}.",
+  "Past first appointment": "Your first appointment was: ",
+  "Past next appointment": "After that: ",
+  "Past last appointment": "And your last appointment was: ",
+  "Upcoming first appointment": "Your first appointment is: ",
+  "Upcoming next appointment": "After that: ",
+  "Upcoming last appointment": "And your last appointment is: ",
+  "Past only appointment": "Your only appointment was: ",
+  "Upcoming only appointment": "Your only appointment is: ",
+  "Your next appointment": "Your next appointment is {0} on {1} at {2}",
+  "Your first appointment": "Your first appointment {0}, is {1} at {2}",
+  "Schedule appointments": "You have {0}{1} {2} {3}.",
+  "Tomorrows first appointment": "Your first appointment tomorrow is {0} at {1}"
 }

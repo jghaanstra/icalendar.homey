@@ -7,14 +7,27 @@
     <script type="text/javascript" src="../assets/scripts/jquery-3.3.1.slim.min.js"></script>
     <style>
       fieldset.calendars .row.entries {
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid #333;
+        margin-bottom: 1em;
         padding-bottom: 1em;
       }
+      fieldset.calendars .row.entries:last-child {
+        border-bottom: 0;
+      }
       fieldset.calendars .row input {
+        font-size: 12px;
         margin-bottom: 4px;
+        padding-bottom: 3px;
       }
       fieldset.settings .row label.calendar_name_label_interval {
         width: auto;
+      }
+      button#add {
+        background-color: #00c139 !important;
+      }
+      button#delete {
+        background-color: #EC3505 !important;
+        color: #fff !important;
       }
     </style>
   </head>
@@ -37,9 +50,6 @@
       <div class="field row">
         <label class="calendar_name_label_interval"><span data-i18n="settings.general.interval">Refresh interval in minutes</span></label>
         <select id="calendar_refresh_interval">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="15">15</option>
@@ -68,6 +78,7 @@
               newCal.removeClass("new_calendar");
               $(".calendar_name", newCal).val(calendar.name);
               $(".calendar_url", newCal).val(calendar.url);
+              $(newCal).append("<button id='delete' onclick='deleteCal(this)'>&times;</button>");
               newCal.insertBefore(".new_calendar");
             }
           }
@@ -111,6 +122,12 @@
             if (err) return Homey.alert(err);
           });
         });
+      }
+
+      // delete calendar
+      function deleteCal(e) {
+        $(e).parent('.field.row.entries').remove();
+        $("button#save").trigger("click");
       }
     </script>
   </body>

@@ -1,5 +1,4 @@
 {
-  "moment_locale": "nl",
   "settings": {
     "title": "iCalendar voor Homey",
     "calendars": {
@@ -13,5 +12,33 @@
       "interval": "Ververs frequentie in minuten",
       "save": "Opslaan"
     }
-  }
+  },
+  "moment_locale": "nl",
+  "Appointment": "afspraak",
+  "Appointments": "afspraken",
+  "Today": "vandaag",
+  "Tomorrow": "morgen",
+  "Monday": "maandag",
+  "Tuesday": "dinsdag",
+  "Wednesday": "woensdag",
+  "Thursday": "donderdag",
+  "Friday": "vrijdag",
+  "Saturday": "zaterdag",
+  "Sunday": "zondag",
+  "All": "Alle kalenders",
+  "Upcoming": " komende",
+  "List of appointments": "{0} om {1}.",
+  "No appointments": "Je hebt geen afspraken {0}.",
+  "Past first appointment": "Je eerste afspraak was: ",
+  "Past next appointment": "Daarna: ",
+  "Past last appointment": "En je laatste afspraak was: ",
+  "Upcoming first appointment": "Je eerste afspraak is: ",
+  "Upcoming next appointment": "Daarna: ",
+  "Upcoming last appointment": "En je laatste afspraak is: ",
+  "Past only appointment": "Je enige afspraak was: ",
+  "Upcoming only appointment": "Je enige afspraak is: ",
+  "Your next appointment": "Je volgende afspraak is {0} op {1} om {2}",
+  "Your first appointment": "Je eerste afspraak {0}, is {1} om {2}",
+  "Schedule appointments": "Je hebt {0}{1} {2} {3}.",
+  "Tomorrows first appointment": "Je eerste afspraak morgen is {0} om {1}"
 }
