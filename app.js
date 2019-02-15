@@ -440,7 +440,7 @@ class CalendarApp extends Homey.App {
           Homey.ManagerSpeechOutput.say(
             Homey.__("Your next appointment")
               .replace("{0}", events.title)
-              .replace("{1}", moment(events.startdate).format('L').substring(0, moment(events.startdate).format('L') - 5))
+              .replace("{1}", moment(events.startdate).format('LL').substring(0, moment(events.startdate).format('L').length - 5))
               .replace("{2}", moment(events.startdate).format('LT'))
           );
           break;
