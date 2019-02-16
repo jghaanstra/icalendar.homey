@@ -127,8 +127,6 @@ class CalendarApp extends Homey.App {
           break;
       }
 
-      console.log(filtered_events);
-
       if (filtered_events.length > 0 && (type == 'next' || type == 'first')) {
         const speechedEvents = await this.speechEvents(type, filtered_events[0], filtered_events.length, when);
       } else if (filtered_events.length > 0) {
@@ -167,8 +165,7 @@ class CalendarApp extends Homey.App {
         if (args.calendar.id !== 'all') {
           filtered_events = filtered_events.filter(event => event.calendar == args.calendar.name);
         }
-        const speechedEvents = await this.speechEvents('next', filtered_events[0], 1, '');
-        return Promise.resolve();
+        return await this.speechEvents('next', filtered_events[0], 1, '');
       })
       .getArgument('calendar')
       .registerAutocompleteListener((query, args) => {
@@ -187,11 +184,10 @@ class CalendarApp extends Homey.App {
         }
         if (filtered_events.length > 0) {
           const parsed_events = await this.parseEvents(filtered_events);
-          const speechedEvents = await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Today"));
+          return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Today"));
         } else {
-          const speechedEvents = await this.speechEvents('none', [], 0, Homey.__("Today"));
+          return await this.speechEvents('none', [], 0, Homey.__("Today"));
         }
-        return Promise.resolve();
       })
       .getArgument('calendar')
       .registerAutocompleteListener((query, args) => {
@@ -207,15 +203,14 @@ class CalendarApp extends Homey.App {
         }
         if (filtered_events.length > 0) {
           if (args.timespan == 'tomorrow_first') {
-            const speechedEvents = await this.speechEvents(args.timespan, filtered_events[0], 1, Homey.__("Tomorrow"));
+            return await this.speechEvents(args.timespan, filtered_events[0], 1, Homey.__("Tomorrow"));
           } else {
             const parsed_events = await this.parseEvents(filtered_events);
-            const speechedEvents = await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Tomorrow"));
+            return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Tomorrow"));
           }
         } else {
-          const speechedEvents = await this.speechEvents('none', [], 0, Homey.__("Tomorrow"));
+          return await this.speechEvents('none', [], 0, Homey.__("Tomorrow"));
         }
-        return Promise.resolve();
       })
       .getArgument('calendar')
       .registerAutocompleteListener((query, args) => {
@@ -259,11 +254,10 @@ class CalendarApp extends Homey.App {
         }
         if (filtered_events.length > 0) {
           const parsed_events = await this.parseEvents(filtered_events);
-          const speechedEvents = await this.speechEvents('dayschedule', parsed_events, filtered_events.length, day);
+          return await this.speechEvents('dayschedule', parsed_events, filtered_events.length, day);
         } else {
-          const speechedEvents = await this.speechEvents('none', [], 0, day);
+          return await this.speechEvents('none', [], 0, day);
         }
-        return Promise.resolve();
       })
       .getArgument('calendar')
       .registerAutocompleteListener((query, args) => {
@@ -422,7 +416,7 @@ class CalendarApp extends Homey.App {
   }
 
   speechEvents(type, events, number, timespan) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async (resolve, reject) => {
       if (number == 1) {
         var appointment = Homey.__("Appointment");
       } else {
@@ -431,26 +425,29 @@ class CalendarApp extends Homey.App {
 
       switch(type) {
         case 'none':
-          Homey.ManagerSpeechOutput.say(
+          await Homey.ManagerSpeechOutput.say(
             Homey.__("No appointments")
               .replace("{0}", timespan)
           );
+          return resolve();
           break;
         case 'next':
-          Homey.ManagerSpeechOutput.say(
+          await Homey.ManagerSpeechOutput.say(
             Homey.__("Your next appointment")
               .replace("{0}", events.title)
               .replace("{1}", moment(events.startdate).format('LL').substring(0, moment(events.startdate).format('LL').length - 5))
               .replace("{2}", moment(events.startdate).format('LT'))
           );
+          return resolve();
           break;
         case 'first':
-          Homey.ManagerSpeechOutput.say(
+          await Homey.ManagerSpeechOutput.say(
             Homey.__("Your first appointment")
               .replace("{0}", timespan)
               .replace("{1}", events.title)
               .replace("{2}", moment(events.startdate).format('LT'))
           );
+          return resolve();
           break;
         case 'today_all':
           Homey.ManagerSpeechOutput.say(
@@ -460,8 +457,13 @@ class CalendarApp extends Homey.App {
               .replace("{2}", appointment)
               .replace("{3}", timespan)
           );
+          var i = 0;
           for (let event of events) {
-            Homey.ManagerSpeechOutput.say(event.string);
+            i++
+            await Homey.ManagerSpeechOutput.say(event.string);
+            if (i == events.length) {
+              return resolve();
+            }
           }
           break;
         case 'today_upcoming':
@@ -472,8 +474,13 @@ class CalendarApp extends Homey.App {
               .replace("{2}", appointment)
               .replace("{3}", timespan)
           );
+          var i = 0;
           for (let event of events) {
-            Homey.ManagerSpeechOutput.say(event.string);
+            i++
+            await Homey.ManagerSpeechOutput.say(event.string);
+            if (i == events.length) {
+              return resolve();
+            }
           }
           break;
         case 'tomorrow_all':
@@ -484,16 +491,22 @@ class CalendarApp extends Homey.App {
               .replace("{2}", appointment)
               .replace("{3}", timespan)
           );
+          var i = 0;
           for (let event of events) {
-            Homey.ManagerSpeechOutput.say(event.string);
+            i++
+            await Homey.ManagerSpeechOutput.say(event.string);
+            if (i == events.length) {
+              return resolve();
+            }
           }
           break;
         case 'tomorrow_first':
-          Homey.ManagerSpeechOutput.say(
+          await Homey.ManagerSpeechOutput.say(
             Homey.__("Tomorrows first appointment")
               .replace("{0}", events.title)
               .replace("{1}", moment(events.startdate).format('LT'))
           );
+          return resolve();
           break;
         case 'dayschedule':
           Homey.ManagerSpeechOutput.say(
@@ -503,8 +516,13 @@ class CalendarApp extends Homey.App {
               .replace("{2}", appointment)
               .replace("{3}", timespan)
           );
+          var i = 0;
           for (let event of events) {
-            Homey.ManagerSpeechOutput.say(event.string);
+            i++
+            await Homey.ManagerSpeechOutput.say(event.string);
+            if (i == events.length) {
+              return resolve();
+            }
           }
           break;
         default:
