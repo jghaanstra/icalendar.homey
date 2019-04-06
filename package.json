@@ -1,6 +1,6 @@
 {
   "name": "icalendar.homey",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Homey app for using calendars in the icalendar format",
   "main": "app.js",
   "scripts": {
@@ -21,6 +21,6 @@
   "homepage": "https://apps.athom.com/app/icalendar.homey",
   "dependencies": {
     "moment": "^2.23.0",
-    "node-ical": "^0.9.0"
+    "node-ical": "^0.9.2"
   }
 }

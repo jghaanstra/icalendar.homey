@@ -24,4 +24,6 @@ After installation go to the app settings and select the iCalender app settings 
 For support please use the official support topic on the forum [here](https://community.athom.com/t/765).
 
 ## Changelog
-### v1.0.0- 2019-02-15
+### v1.0.1 - 2019-04-06
+* FIX: today's event for all calendars returned no results
+* UPDATE: update node-ical to 0.9.2

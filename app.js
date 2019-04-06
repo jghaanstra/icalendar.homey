@@ -179,7 +179,7 @@ class CalendarApp extends Homey.App {
         if (args.timespan == 'today_upcoming') {
           filtered_events = await filtered_events.filter(event => event.startdate > moment());
         }
-        if (args.calendar.id !== 'today_all') {
+        if (args.calendar.id !== 'all') {
           filtered_events = await filtered_events.filter(event => event.calendar == args.calendar.name);
         }
         if (filtered_events.length > 0) {
@@ -277,14 +277,13 @@ class CalendarApp extends Homey.App {
       for (let k in data) {
     		if (data.hasOwnProperty(k)) {
 
-          var rangeStart = moment().startOf("day");
-          var rangeEnd = moment(rangeStart).add(1, "months");
+          var rangeStart = moment().startOf("day").local();
+          var rangeEnd = moment(rangeStart).add(1, "months").local();
           var event = data[k];
 
     			if (event.type == 'VEVENT') {
 
-            var title = event.summary;
-    	      var startDate = moment(event.start);
+            var startDate = moment(event.start);
     	      var endDate = moment(event.end);
             var duration = parseInt(endDate.format("x")) - parseInt(startDate.format("x"));
 
@@ -292,7 +291,7 @@ class CalendarApp extends Homey.App {
               // single events
               temp_events.push({
                 calendar: calendar.name,
-                title: title,
+                title: event.summary,
                 startdate: event.start,
                 enddate: event.end,
                 duration: moment.duration(duration).humanize(),
@@ -325,7 +324,7 @@ class CalendarApp extends Homey.App {
 
         				startDate = moment(date);
 
-        				var dateLookupKey = date.toISOString().substring(0, 10);
+                var dateLookupKey = date.toISOString().substring(0, 10);
 
         				if ((curEvent.recurrences != undefined) && (curEvent.recurrences[dateLookupKey] != undefined)) {
         					curEvent = curEvent.recurrences[dateLookupKey];
@@ -335,7 +334,6 @@ class CalendarApp extends Homey.App {
         					showRecurrence = false;
         				}
 
-        				var recurrenceTitle = curEvent.summary;
                 var recurrenceLocation = curEvent.location;
         				endDate = moment(parseInt(startDate.format("x")) + curDuration, 'x');
 
@@ -346,7 +344,7 @@ class CalendarApp extends Homey.App {
         				if (showRecurrence === true) {
                   temp_events.push({
                     calendar: calendar.name,
-                    title: recurrenceTitle,
+                    title: curEvent.summary,
                     startdate: startDate,
                     enddate: endDate,
                     duration: moment.duration(curDuration).humanize(),
