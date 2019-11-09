@@ -24,4 +24,5 @@ After installation go to the app settings and select the iCalender app settings 
 For support please use the official support topic on the forum [here](https://community.athom.com/t/765).
 
 ## Changelog
-### v1.0.0- 2019-02-15
+### v1.0.2- 2019-11-08
+* IMPROVEMENT: small change to fix an issue with DST

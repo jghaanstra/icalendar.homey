@@ -345,7 +345,7 @@ class CalendarApp extends Homey.App {
                   temp_events.push({
                     calendar: calendar.name,
                     title: curEvent.summary,
-                    startdate: startDate,
+                    startdate: curEvent.start,
                     enddate: endDate,
                     duration: moment.duration(curDuration).humanize(),
                     location: recurrenceLocation,
@@ -377,6 +377,7 @@ class CalendarApp extends Homey.App {
       for (let event of filtered_events) {
         let date = moment(event.startdate).format('L');
         let time = moment(event.startdate).format('LT');
+
         let tokens = {
           'calendar': event.calendar,
           'date': date,
