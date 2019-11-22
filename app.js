@@ -383,7 +383,7 @@ class CalendarApp extends Homey.App {
           'date': date,
           'time': time,
           'title': event.title,
-          'location': event.location
+          'location': event.location || Homey.__("not available")
         }
         let state = {
           'calendar': event.calendar,

@@ -41,5 +41,6 @@
   "Your next appointment": "Je volgende afspraak is {0} op {1} om {2}",
   "Your first appointment": "Je eerste afspraak {0}, is {1} om {2}",
   "Schedule appointments": "Je hebt {0}{1} {2} {3}.",
-  "Tomorrows first appointment": "Je eerste afspraak morgen is {0} om {1}"
+  "Tomorrows first appointment": "Je eerste afspraak morgen is {0} om {1}",
+  "not available": "niet beschikbaar"
 }

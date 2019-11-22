@@ -1,6 +1,6 @@
 {
   "name": "icalendar.homey",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Homey app for using calendars in the icalendar format",
   "main": "app.js",
   "scripts": {

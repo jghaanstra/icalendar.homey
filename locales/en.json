@@ -41,5 +41,6 @@
   "Your next appointment": "Your next appointment is {0} on {1} at {2}",
   "Your first appointment": "Your first appointment {0}, is {1} at {2}",
   "Schedule appointments": "You have {0}{1} {2} {3}.",
-  "Tomorrows first appointment": "Your first appointment tomorrow is {0} at {1}"
+  "Tomorrows first appointment": "Your first appointment tomorrow is {0} at {1}",
+  "not available": "not available"
 }

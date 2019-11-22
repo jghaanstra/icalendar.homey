@@ -1,5 +1,5 @@
 # iCalendar for Homey
-This Homey app allows you to add your calendars to Homey using the ical format. After adding your calendar(s) you will be able to start flows based on upcoming calendar events or have Homey tell you your appointments. You can add multiple calendars and for each trigger or action select which appointments should be returned. The app is inspired by the original iCalendar to Voice app but has been completely rewritten.
+This Homey app allows you to add your calendars to Homey using the ical format. After adding your calendar(s) you will be able to start flows based on upcoming calendar events or have Homey tell you your appointments. You can add multiple calendars and for each trigger or action select which appointments should be returned. The app is inspired by the original iCalendar to Voice app but has been completely rewritten and serves as an alternative outside the app store that fixes an issue with recurring events.
 
 ## Instructions
 After installation go to the app settings and select the iCalender app settings page. Here you can add your calendars by supplying a recognizable name and iCal link. If you don't know how to get the iCal link from your calendar, just Google for it. Below are the steps to retrieve the iCal link from a Google Calendar.
@@ -20,10 +20,6 @@ After installation go to the app settings and select the iCalender app settings 
 * What is my first appointment tomorrow?
 * What are all my appointments for today/tomorrow/sunday/monday/tuesday/wednesday/thursday/friday/saturday/?
 
-## Support topic
-For support please use the official support topic on the forum [here](https://community.athom.com/t/765).
-
 ## Changelog
-### v1.0.1 - 2019-04-06
-* FIX: today's event for all calendars returned no results
-* UPDATE: update node-ical to 0.9.2
+### v1.0.3 - 2019-11-23
+* FIX: fix for events with undefined location
