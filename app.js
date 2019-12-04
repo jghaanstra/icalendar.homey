@@ -342,10 +342,16 @@ class CalendarApp extends Homey.App {
         				}
 
         				if (showRecurrence === true) {
+
+                  /* HACK FOR DST OFFSET FOR RECURRING EVENTS */
+                  if(!moment(startDate).isDST()) {
+                    startDate = moment(startDate).add(1, 'hours')
+                  }
+
                   temp_events.push({
                     calendar: calendar.name,
                     title: curEvent.summary,
-                    startdate: curEvent.start,
+                    startdate: startDate,
                     enddate: endDate,
                     duration: moment.duration(curDuration).humanize(),
                     location: recurrenceLocation,

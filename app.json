@@ -1,7 +1,7 @@
 {
 	"id": "icalendar.homey",
 	"sdk": 2,
-	"brandColor": "#ec4134",
+	"brandColor": "#000000",
 	"name": {
 		"en": "iCalendar",
 		"nl": "iCalendar"
@@ -10,8 +10,8 @@
 		"en": [ "calendar", "agenda", "icalendar", "ical" ],
 		"nl": [ "kalender", "agenda", "icalendar", "ical" ]
 	},
-	"version": "1.0.3",
-	"compatibility": ">=2.0.0",
+	"version": "1.0.4",
+	"compatibility": ">=3.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
 		"email": "homey@solidewebservices.com",
@@ -27,7 +27,6 @@
 	"bugs": {
 		"url": "https://github.com/jghaanstra/icalendar.homey/issues"
 	},
-	"homeyCommunityTopicId": 765,
 	"images": {
 		"large": "./assets/images/large.jpg",
 		"small": "./assets/images/small.jpg"
