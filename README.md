@@ -21,5 +21,5 @@ After installation go to the app settings and select the iCalender app settings 
 * What are all my appointments for today/tomorrow/sunday/monday/tuesday/wednesday/thursday/friday/saturday/?
 
 ## Changelog
-### v1.0.4 - 2019-12-04
-* FIX: another fix/hack for recurring events and DST
+### v3.0.0 - 2020-08-05
+* Updated to SDK3.

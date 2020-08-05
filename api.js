@@ -1,5 +1,3 @@
-const Homey = require('homey');
+'use strict';
 
-module.exports = [
-
-]
+module.exports = {}

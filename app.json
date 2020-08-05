@@ -1,6 +1,6 @@
 {
 	"id": "icalendar.homey",
-	"sdk": 2,
+	"sdk": 3,
 	"brandColor": "#000000",
 	"name": {
 		"en": "iCalendar",
@@ -10,8 +10,8 @@
 		"en": [ "calendar", "agenda", "icalendar", "ical" ],
 		"nl": [ "kalender", "agenda", "icalendar", "ical" ]
 	},
-	"version": "1.0.4",
-	"compatibility": ">=3.0.0",
+	"version": "3.0.0",
+	"compatibility": ">=5.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
 		"email": "homey@solidewebservices.com",

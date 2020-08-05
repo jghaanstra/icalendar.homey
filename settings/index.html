@@ -79,9 +79,8 @@
         Homey.ready();
 
         // fetch existing calendars
-        Homey.get("calendars", function (err, calendars) {
-          if( err ) return Homey.alert( err );
-          if (calendars) {
+        Homey.get("calendars")
+          .then(result => {
             for (var i = 0; i < calendars.length; i++) {
               var calendar = calendars[i];
               var newCal = $(".new_calendar").clone();
@@ -91,14 +90,18 @@
               $(newCal).append("<button id='delete' onclick='deleteCal(this)'>&times;</button>");
               newCal.insertBefore(".new_calendar");
             }
-          }
-        });
+          })
+          .catch(error => {
+            return Homey.alert(error);
+          })
 
-        // fetch interval settings
-        Homey.get("calendar_refresh_interval", function(err, intervalInMinutes) {
-          if( err ) return Homey.alert( err );
-          $("#calendar_refresh_interval").val(intervalInMinutes || 5);
-        });
+        Homey.get('calendar_refresh_interval')
+          .then(calendar_refresh_interval => {
+            document.getElementById('calendar_refresh_interval').value = calendar_refresh_interval;
+          })
+          .catch(error => {
+            return console.error('Could not get calendar refresh interval', error);
+          })
 
         // add new calendar
         document.getElementById("add").addEventListener("click", function(e) {
@@ -125,14 +128,16 @@
           setTimeout(function() { $(".messages").hide(); }, 5000);
 
           // save refresh interval
-          Homey.set('calendar_refresh_interval', refreshIntervalInMinutes, function(err) {
-            if (err) return Homey.alert(err);
-          });
+          Homey.set('calendar_refresh_interval', refreshIntervalInMinutes)
+            .catch(error => {
+              return Homey.alert(error);
+            })
 
           // save calendars
-          Homey.set('calendars', calendars, function(err) {
-            if (err) return Homey.alert(err);
-          });
+          Homey.set('calendars', calendars)
+            .catch(error => {
+              return Homey.alert(error);
+            })
         });
       }
 

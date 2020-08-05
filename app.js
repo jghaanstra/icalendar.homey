@@ -13,7 +13,7 @@ class CalendarApp extends Homey.App {
     this.log('Initializing iCalendar for Homey App ...');
 
     // MOMENT
-    if (Homey.__("moment_locale") == 'nl') {
+    if (this.homey.__("app.moment_locale") == 'nl') {
       moment.updateLocale('nl', {
         months : [ "januari", "februari", "maart", "april", "mei", "juni", "july", "augustus", "september", "oktober", "november", "december" ]
       });
@@ -25,18 +25,18 @@ class CalendarApp extends Homey.App {
 
     // START EVENT UPDATES
     setTimeout(this.updateEvents.bind(this), 500);
-    var interval = Homey.ManagerSettings.get("calendar_refresh_interval") || 5;
+    var interval = this.homey.settings.get("calendar_refresh_interval") || 5;
     this.updateEventsInterval = setInterval(this.updateEvents.bind(this), interval * 60 * 1000 + 500);
 
     // START TRIGGER CHECKS EVERY MINUTE
     this.checkEventsInterval = setInterval(this.checkEvents.bind(this), 60 * 1000);
 
     // SPEECH
-    Homey.ManagerSpeechInput.on('speechEval', function(speech, callback) {
+    this.homey.speechInput.on('speechEval', function(speech, callback) {
       callback(null, true);
     });
 
-    Homey.ManagerSpeechInput.on('speechMatch', async (speech, onSpeechEvalData) => {
+    this.homey.speechInput.on('speechMatch', async (speech, onSpeechEvalData) => {
       this.log('speechMatch');
       let filtered_events = [];
       let type = 'dayschedule';
@@ -139,9 +139,8 @@ class CalendarApp extends Homey.App {
     });
 
     // FLOW CARDS TRIGGERS
-    new Homey.FlowCardTrigger('trigger_next_appointment_in')
-      .register()
-      .registerRunListener((args, state) => {
+    this.homey.flow.getTriggerCard('trigger_next_appointment_in')
+      .registerRunListener(async (args, state) => {
         let triggerTime = moment(state.startdate).subtract(args.timespan, 'minutes');
         let rangeStart = moment().subtract(30000, 'milliseconds');
         let rangeEnd = moment().add(30000, 'milliseconds');
@@ -153,14 +152,13 @@ class CalendarApp extends Homey.App {
         }
       })
       .getArgument('calendar')
-      .registerAutocompleteListener((query, args) => {
-        return this.getCalendars();
+      .registerAutocompleteListener(async (query, args) => {
+        return await this.getCalendars();
       })
 
     // FLOW CARDS ACTIONS
-    new Homey.FlowCardAction('action_next_appointment')
-      .register()
-      .registerRunListener(async (args, state) => {
+    this.homey.flow.getActionCard('action_next_appointment')
+      .registerRunListener(async (args) => {
         let filtered_events = await events.filter(event => event.startdate > moment());
         if (args.calendar.id !== 'all') {
           filtered_events = filtered_events.filter(event => event.calendar == args.calendar.name);
@@ -168,13 +166,12 @@ class CalendarApp extends Homey.App {
         return await this.speechEvents('next', filtered_events[0], 1, '');
       })
       .getArgument('calendar')
-      .registerAutocompleteListener((query, args) => {
-        return this.getCalendars();
+      .registerAutocompleteListener(async (query, args) => {
+        return await this.getCalendars();
       })
 
-    new Homey.FlowCardAction('action_todays_appointments')
-      .register()
-      .registerRunListener(async (args, state) => {
+    this.homey.flow.getActionCard('action_todays_appointments')
+      .registerRunListener(async (args) => {
         let filtered_events = await events.filter(event => moment(event.startdate).format('L') == moment().format('L'));
         if (args.timespan == 'today_upcoming') {
           filtered_events = await filtered_events.filter(event => event.startdate > moment());
@@ -184,42 +181,40 @@ class CalendarApp extends Homey.App {
         }
         if (filtered_events.length > 0) {
           const parsed_events = await this.parseEvents(filtered_events);
-          return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Today"));
+          return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, this.homey.__("app.today"));
         } else {
-          return await this.speechEvents('none', [], 0, Homey.__("Today"));
+          return await this.speechEvents('none', [], 0, this.homey.__("app.today"));
         }
       })
       .getArgument('calendar')
-      .registerAutocompleteListener((query, args) => {
-        return this.getCalendars();
+      .registerAutocompleteListener(async (query, args) => {
+        return await this.getCalendars();
       })
 
-    new Homey.FlowCardAction('action_tomorrows_appointments')
-      .register()
-      .registerRunListener(async (args, state) => {
+    this.homey.flow.getActionCard('action_tomorrows_appointments')
+      .registerRunListener(async (args) => {
         let filtered_events = await events.filter(event => moment(event.startdate).format('L') == moment().add(1, 'days').format('L'));
         if (args.calendar.id !== 'all') {
           filtered_events = await filtered_events.filter(event => event.calendar == args.calendar.name);
         }
         if (filtered_events.length > 0) {
           if (args.timespan == 'tomorrow_first') {
-            return await this.speechEvents(args.timespan, filtered_events[0], 1, Homey.__("Tomorrow"));
+            return await this.speechEvents(args.timespan, filtered_events[0], 1, this.homey.__("app.tomorrow"));
           } else {
             const parsed_events = await this.parseEvents(filtered_events);
-            return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, Homey.__("Tomorrow"));
+            return await this.speechEvents(args.timespan, parsed_events, filtered_events.length, this.homey.__("app.tomorrow"));
           }
         } else {
-          return await this.speechEvents('none', [], 0, Homey.__("Tomorrow"));
+          return await this.speechEvents('none', [], 0, this.homey.__("app.tomorrow"));
         }
       })
       .getArgument('calendar')
-      .registerAutocompleteListener((query, args) => {
-        return this.getCalendars();
+      .registerAutocompleteListener(async (query, args) => {
+        return await this.getCalendars();
       })
 
-    new Homey.FlowCardAction('action_dayschedule')
-      .register()
-      .registerRunListener(async (args, state) => {
+    this.homey.flow.getActionCard('action_dayschedule')
+      .registerRunListener(async (args) => {
         if (moment().isoWeekday() <= args.dow) {
           var request_day = moment().isoWeekday(Number(args.dow));
         } else {
@@ -227,25 +222,25 @@ class CalendarApp extends Homey.App {
         }
         switch (args.dow) {
           case '1':
-            var day = Homey.__("Monday");
+            var day = this.homey.__("app.monday");
             break;
           case '2':
-            var day = Homey.__("Tuesday");
+            var day = this.homey.__("app.tuesday");
             break;
           case '3':
-            var day = Homey.__("Wednesday");
+            var day = this.homey.__("app.wednesday");
             break;
           case '4':
-            var day = Homey.__("Thursday");
+            var day = this.homey.__("app.thursday");
             break;
           case '5':
-            var day = Homey.__("Friday");
+            var day = this.homey.__("app.friday");
             break;
           case '6':
-            var day = Homey.__("Saturday");
+            var day = this.homey.__("app.saturday");
             break;
           case '7':
-            var day = Homey.__("Sunday");
+            var day = this.homey.__("app.sunday");
             break;
         }
         let filtered_events = await events.filter(event => moment(event.startdate).format('L') == moment(request_day).format('L'));
@@ -267,7 +262,7 @@ class CalendarApp extends Homey.App {
   }
 
   async updateEvents() {
-    const calendars = Homey.ManagerSettings.get("calendars") || [];
+    const calendars = this.homey.settings.get("calendars") || [];
     const icalFromURL = promisify(ical.fromURL);
     temp_events.length = 0;
 
@@ -389,24 +384,24 @@ class CalendarApp extends Homey.App {
           'date': date,
           'time': time,
           'title': event.title,
-          'location': event.location || Homey.__("not available")
+          'location': event.location || this.homey.__("app.not_available")
         }
         let state = {
           'calendar': event.calendar,
           'startdate': event.startdate
         }
-        Homey.ManagerFlow.getCard('trigger', 'trigger_next_appointment_in').trigger(tokens, state);
+        this.homey.flow.getTriggerCard('trigger', 'trigger_next_appointment_in').trigger(tokens, state);
       }
     }
   }
 
   getCalendars() {
-    return new Promise(function (resolve, reject) {
-      const calendars = Homey.ManagerSettings.get("calendars") || [];
+    return new Promise((resolve, reject) => {
+      const calendars = this.homey.settings.get("calendars") || [];
       const list = [];
       list.push({
         icon: '/app/icalendar.homey/assets/icon.svg',
-        name: Homey.__("All"),
+        name: this.homey.__("app.all"),
         id: 'all'
       });
       for (const calendar of calendars) {
@@ -423,22 +418,22 @@ class CalendarApp extends Homey.App {
   speechEvents(type, events, number, timespan) {
     return new Promise(async (resolve, reject) => {
       if (number == 1) {
-        var appointment = Homey.__("Appointment");
+        var appointment = this.homey.__("app.appointment");
       } else {
-        var appointment = Homey.__("Appointments");
+        var appointment = this.homey.__("app.appointments");
       }
 
       switch(type) {
         case 'none':
-          await Homey.ManagerSpeechOutput.say(
-            Homey.__("No appointments")
+          await this.homey.speechOutput.say(
+            this.homey.__("app.no_appointments")
               .replace("{0}", timespan)
           );
           return resolve();
           break;
         case 'next':
-          await Homey.ManagerSpeechOutput.say(
-            Homey.__("Your next appointment")
+          await this.homey.speechOutput.say(
+            this.homey.__("app.next_appointment")
               .replace("{0}", events.title)
               .replace("{1}", moment(events.startdate).format('LL').substring(0, moment(events.startdate).format('LL').length - 5))
               .replace("{2}", moment(events.startdate).format('LT'))
@@ -446,8 +441,8 @@ class CalendarApp extends Homey.App {
           return resolve();
           break;
         case 'first':
-          await Homey.ManagerSpeechOutput.say(
-            Homey.__("Your first appointment")
+          await this.homey.speechOutput.say(
+            this.homey.__("app.first_appointment")
               .replace("{0}", timespan)
               .replace("{1}", events.title)
               .replace("{2}", moment(events.startdate).format('LT'))
@@ -455,8 +450,8 @@ class CalendarApp extends Homey.App {
           return resolve();
           break;
         case 'today_all':
-          Homey.ManagerSpeechOutput.say(
-            Homey.__("Schedule appointments")
+          this.homey.speechOutput.say(
+            this.homey.__("app.schedule_appointments")
               .replace("{0}", number)
               .replace("{1}", '')
               .replace("{2}", appointment)
@@ -465,32 +460,32 @@ class CalendarApp extends Homey.App {
           var i = 0;
           for (let event of events) {
             i++
-            await Homey.ManagerSpeechOutput.say(event.string);
+            await this.homey.speechOutput.say(event.string);
             if (i == events.length) {
               return resolve();
             }
           }
           break;
         case 'today_upcoming':
-          Homey.ManagerSpeechOutput.say(
-            Homey.__("Schedule appointments")
+          this.homey.speechOutput.say(
+            this.homey.__("app.schedule_appointments")
               .replace("{0}", number)
-              .replace("{1}", Homey.__("Upcoming"))
+              .replace("{1}", this.homey.__("app.upcoming"))
               .replace("{2}", appointment)
               .replace("{3}", timespan)
           );
           var i = 0;
           for (let event of events) {
             i++
-            await Homey.ManagerSpeechOutput.say(event.string);
+            await this.homey.speechOutput.say(event.string);
             if (i == events.length) {
               return resolve();
             }
           }
           break;
         case 'tomorrow_all':
-          Homey.ManagerSpeechOutput.say(
-            Homey.__("Schedule appointments")
+          this.homey.speechOutput.say(
+            this.homey.__("app.schedule_appointments")
               .replace("{0}", number)
               .replace("{1}", '')
               .replace("{2}", appointment)
@@ -499,23 +494,23 @@ class CalendarApp extends Homey.App {
           var i = 0;
           for (let event of events) {
             i++
-            await Homey.ManagerSpeechOutput.say(event.string);
+            await this.homey.speechOutput.say(event.string);
             if (i == events.length) {
               return resolve();
             }
           }
           break;
         case 'tomorrow_first':
-          await Homey.ManagerSpeechOutput.say(
-            Homey.__("Tomorrows first appointment")
+          await this.homey.speechOutput.say(
+            this.homey.__("app.tomorrows_first_appointment")
               .replace("{0}", events.title)
               .replace("{1}", moment(events.startdate).format('LT'))
           );
           return resolve();
           break;
         case 'dayschedule':
-          Homey.ManagerSpeechOutput.say(
-            Homey.__("Schedule appointments")
+          this.homey.speechOutput.say(
+            this.homey.__("app.schedule_appointments")
               .replace("{0}", number)
               .replace("{1}", '')
               .replace("{2}", appointment)
@@ -524,7 +519,7 @@ class CalendarApp extends Homey.App {
           var i = 0;
           for (let event of events) {
             i++
-            await Homey.ManagerSpeechOutput.say(event.string);
+            await this.homey.speechOutput.say(event.string);
             if (i == events.length) {
               return resolve();
             }
@@ -539,7 +534,7 @@ class CalendarApp extends Homey.App {
   }
 
   parseEvents(events) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       let parsedEvent = '';
       let parsedEvents = [];
       var i = 0;
@@ -547,23 +542,23 @@ class CalendarApp extends Homey.App {
         i++
         let parsedEvent = '';
         if (events.length == 1 && moment(event.startdate).isBefore(moment())) {
-          parsedEvent = Homey.__("Past only appointment");
+          parsedEvent = this.homey.__("app.past_only_appointment");
         } else if (events.length == 1 && moment().isBefore(moment(event.startdate))) {
-          parsedEvent = Homey.__("Upcoming only appointment");
+          parsedEvent = this.homey.__("app.upcoming_only_appointment");
         } else if (i == 1 && moment(event.startdate).isBefore(moment())) {
-          parsedEvent = Homey.__("Past first appointment");
+          parsedEvent = this.homey.__("app.past_first_appointment");
         } else if (i == 1 && moment().isBefore(moment(event.startdate))) {
-          parsedEvent = Homey.__("Upcoming first appointment");
+          parsedEvent = this.homey.__("app.upcoming_first_appointment");
         } else if (i == events.length && moment(event.startdate).isBefore(moment())) {
-          parsedEvent = Homey.__("Past last appointment");
+          parsedEvent = this.homey.__("app.past_last_appointment");
         } else if (i == events.length && moment().isBefore(moment(event.startdate))) {
-          parsedEvent = Homey.__("Upcoming last appointment");
+          parsedEvent = this.homey.__("app.upcoming_last_appointment");
         } else if (moment(event.startdate).isBefore(moment())) {
-          parsedEvent = Homey.__("Past next appointment");
+          parsedEvent = this.homey.__("app.past_next_appointment");
         } else {
-          parsedEvent = Homey.__("Upcoming next appointment");
+          parsedEvent = this.homey.__("app.upcoming_next_appointment");
         }
-        parsedEvent += Homey.__("List of appointments")
+        parsedEvent += this.homey.__("app.list_of_appointments")
           .replace("{0}", event.title)
           .replace("{1}", moment(event.startdate).format('LT'));
         parsedEvents.push({
