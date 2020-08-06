@@ -390,7 +390,7 @@ class CalendarApp extends Homey.App {
           'calendar': event.calendar,
           'startdate': event.startdate
         }
-        this.homey.flow.getTriggerCard('trigger', 'trigger_next_appointment_in').trigger(tokens, state);
+        this.homey.flow.getTriggerCard('trigger_next_appointment_in').trigger(tokens, state);
       }
     }
   }
